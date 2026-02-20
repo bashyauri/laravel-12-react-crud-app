@@ -81,14 +81,20 @@ export const CustomTable = ({ columns, actions, data, from, onDelete, onView, on
     };
 
     return (
-        <div className="overflow-hidden rounded-lg border bg-white shadow-sm">
+        <div className="overflow-hidden rounded-lg border bg-white shadow-sm dark:border-gray-700 dark:bg-gray-900">
             <table className="w-full table-auto">
                 <thead>
-                    <tr className="bg-gray-700 text-white">
-                        <th className="border p-4">#</th>
+                    <tr className="bg-gray-700 text-white dark:bg-gray-800 dark:text-gray-100">
+                        <th className="border p-4 dark:border-gray-700">#</th>
 
                         {columns.map((column, index) => (
-                            <th key={column.key} className={column.className}>
+                            <th
+                                key={column.key}
+                                className={
+                                    (column.className ? column.className + ' ' : '') +
+                                    'border bg-gray-700 text-white dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100'
+                                }
+                            >
                                 {column.label}{' '}
                             </th>
                         ))}
@@ -98,11 +104,11 @@ export const CustomTable = ({ columns, actions, data, from, onDelete, onView, on
                 <tbody>
                     {data.length > 0 ? (
                         data.map((row, index) => (
-                            <tr key={index}>
-                                <td className="border px-4 py-2 text-center">{from + index}</td>
+                            <tr key={index} className="bg-white even:bg-gray-50 dark:bg-gray-900 dark:even:bg-gray-800">
+                                <td className="border px-4 py-2 text-center dark:border-gray-700 dark:text-gray-100">{from + index}</td>
 
                                 {columns.map((col) => (
-                                    <td key={col.key} className="border px-4 py-2 text-center">
+                                    <td key={col.key} className="border px-4 py-2 text-center dark:border-gray-700 dark:text-gray-100">
                                         {col.isImage ? (
                                             <div>
                                                 <img src={row[col.key]} alt={row.name || 'Image'} className="h-16 w-20 rounded-lg object-cover" />
@@ -118,7 +124,7 @@ export const CustomTable = ({ columns, actions, data, from, onDelete, onView, on
                         ))
                     ) : (
                         <tr>
-                            <td colSpan={7} className="text-md py-4 text-center font-bold text-red-600">
+                            <td colSpan={7} className="text-md py-4 text-center font-bold text-red-600 dark:text-red-400">
                                 No Products Found!
                             </td>
                         </tr>
