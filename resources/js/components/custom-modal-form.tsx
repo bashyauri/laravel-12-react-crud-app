@@ -4,6 +4,7 @@ import { Label } from '@/components/ui/label';
 import { DialogClose } from '@radix-ui/react-dialog';
 import InputError from './input-error';
 import { Input } from './ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 
 interface AddButtonProps {
     id: string;
@@ -27,6 +28,7 @@ interface FieldProps {
     rows?: number;
     accept?: string;
     className?: string;
+    options?: { label: string; value: string; key: string }[];
 }
 
 interface ButtonProps {
@@ -125,6 +127,24 @@ export const CustomModalForm = ({
                                             />
                                         )}
                                     </div>
+                                ) : field.type === 'single-select' ? (
+                                    <Select
+                                        value={data[field.name] || ''}
+                                        disabled={processing || mode === 'view'}
+                                        onValueChange={(value) => setData(field.name, value)}
+                                    >
+                                        <SelectTrigger>
+                                            <SelectValue placeholder={`Select ${field.label}`}></SelectValue>
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {field.options &&
+                                                field.options.map((option) => (
+                                                    <SelectItem key={option.key} value={option.value}>
+                                                        {option.label}
+                                                    </SelectItem>
+                                                ))}
+                                        </SelectContent>
+                                    </Select>
                                 ) : (
                                     <Input
                                         id={field.id}

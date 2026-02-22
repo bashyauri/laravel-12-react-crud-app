@@ -1,7 +1,7 @@
 import { CustomModalForm } from '@/components/custom-modal-form';
 import { CustomTable } from '@/components/custom-table';
 import { CustomToast, toast } from '@/components/custom-toast';
-import { CategoryModalFormConfig } from '@/config/forms/category-modal-form';
+import { PermissionModalFormConfig } from '@/config/forms/permission-modal-form';
 import { PermissionsTableConfig } from '@/config/tables/permissions-table';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
@@ -52,7 +52,7 @@ interface FlashProps extends Record<string, any> {
 }
 
 interface IndexProps {
-    categories: PermissionPagination;
+    permissions: PermissionPagination;
     filters: FilterProps;
     totalCount: number;
     filteredCount: number;
@@ -64,12 +64,11 @@ export default function Index({ permissions }: IndexProps) {
     const [modalOpen, setModalOpen] = useState(false);
     const [mode, setMode] = useState<'create' | 'view' | 'edit'>('create');
     const [selectedCategory, setSelectedCategory] = useState<any>(null);
-    const [previewImage, setPreviewImage] = useState<string | null>(null);
 
     const { data, setData, errors, processing, reset, post } = useForm({
-        name: '',
+        module: '',
+        label: '',
         description: '',
-        image: null as File | null,
         _method: 'POST',
     });
 
@@ -79,12 +78,14 @@ export default function Index({ permissions }: IndexProps) {
             router.delete(route, {
                 preserveScroll: true,
                 onSuccess: (response: { props: FlashProps }) => {
-                    const successMessage = response.props.flash?.success || 'Category deleted successfully.';
-                    toast.success(successMessage);
+                    const successMessage = response.props.flash?.success;
+                    if (successMessage) {
+                        toast.success(successMessage);
+                    }
                     closeModal();
                 },
                 onError: (error: Record<string, string>) => {
-                    const errorMessage = error?.message || 'Failed to delete category.';
+                    const errorMessage = error?.message || 'Failed to delete permission.';
                     toast.error(errorMessage);
                     closeModal();
                 },
@@ -100,28 +101,32 @@ export default function Index({ permissions }: IndexProps) {
         if (mode === 'edit' && selectedCategory) {
             data._method = 'PUT';
 
-            post(route('categories.update', selectedCategory.id), {
+            post(route('permissions.update', selectedCategory.id), {
                 forceFormData: true,
                 onSuccess: (response: { props: FlashProps }) => {
-                    const successMessage = response.props.flash?.success || 'Category updated successfully.';
+                    const successMessage = response.props.flash?.success || 'Permission updated successfully.';
                     toast.success(successMessage);
                     closeModal();
                 },
                 onError: (error: Record<string, string>) => {
-                    const errorMessage = error?.message || 'Failed to update category.';
-                    toast.error(errorMessage);
+                    const errorMessage = error?.message;
+                    if (errorMessage) {
+                        toast.error(errorMessage);
+                    }
                 },
             });
         } else {
-            post(route('categories.store'), {
+            post(route('permissions.store'), {
                 onSuccess: (response: { props: FlashProps }) => {
-                    const successMessage = response.props.flash?.success || 'Category created successfully.';
+                    const successMessage = response.props.flash?.success;
                     toast.success(successMessage);
                     closeModal();
                 },
                 onError: (error: Record<string, string>) => {
-                    const errorMessage = error?.message || 'Failed to create category.';
-                    toast.error(errorMessage);
+                    const errorMessage = error?.message;
+                    if (errorMessage) {
+                        toast.error(errorMessage);
+                    }
                 },
             });
         }
@@ -142,7 +147,6 @@ export default function Index({ permissions }: IndexProps) {
 
         if (!open) {
             setMode('create');
-            setPreviewImage(null);
             setSelectedCategory(null);
             reset();
         }
@@ -159,8 +163,6 @@ export default function Index({ permissions }: IndexProps) {
                 }
             });
 
-            // Setting image preview
-            setPreviewImage(category.image);
             setSelectedCategory(category);
         } else {
             reset();
@@ -171,7 +173,7 @@ export default function Index({ permissions }: IndexProps) {
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Categories" />
+            <Head title="Permissions" />
 
             <CustomToast />
 
@@ -179,11 +181,11 @@ export default function Index({ permissions }: IndexProps) {
                 {/* Custom Modal Form Component */}
                 <div className="ml-auto">
                     <CustomModalForm
-                        addButton={CategoryModalFormConfig.addButton}
-                        title={mode === 'view' ? 'View Category' : mode === 'edit' ? 'Update Category' : CategoryModalFormConfig.title}
-                        description={CategoryModalFormConfig.description}
-                        fields={CategoryModalFormConfig.fields}
-                        buttons={CategoryModalFormConfig.buttons}
+                        addButton={PermissionModalFormConfig.addButton}
+                        title={mode === 'view' ? 'View Permission' : mode === 'edit' ? 'Update Permission' : PermissionModalFormConfig.title}
+                        description={PermissionModalFormConfig.description}
+                        fields={PermissionModalFormConfig.fields}
+                        buttons={PermissionModalFormConfig.buttons}
                         data={data}
                         setData={setData}
                         errors={errors}
@@ -192,7 +194,6 @@ export default function Index({ permissions }: IndexProps) {
                         open={modalOpen}
                         onOpenChange={handleModalToggle}
                         mode={mode}
-                        previewImage={previewImage}
                     />
                 </div>
 

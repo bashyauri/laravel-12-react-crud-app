@@ -125,7 +125,7 @@ export const CustomTable = ({ columns, actions, data, from, onDelete, onView, on
                     ) : (
                         <tr>
                             <td colSpan={7} className="text-md py-4 text-center font-bold text-red-600 dark:text-red-400">
-                                No Products Found!
+                                No Data Found!
                             </td>
                         </tr>
                     )}
