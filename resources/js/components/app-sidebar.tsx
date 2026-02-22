@@ -2,17 +2,22 @@ import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
+import { useLayout } from '@/contexts/LayoutContext';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { BookOpen, FileText, Folder, LayoutGrid, ShoppingBag } from 'lucide-react';
+import { BookOpen, FileText, Folder, LayoutGrid, Lock, ShoppingBag } from 'lucide-react';
 import AppLogo from './app-logo';
-import { useLayout } from '@/contexts/LayoutContext';
 
 const mainNavItems: NavItem[] = [
     {
         title: 'Dashboard',
         href: '/dashboard',
         icon: LayoutGrid,
+    },
+    {
+        title: 'Permissions',
+        href: '/permissions',
+        icon: Lock,
     },
     {
         title: 'Manage Products',
@@ -40,7 +45,6 @@ const footerNavItems: NavItem[] = [
 ];
 
 export function AppSidebar() {
-
     const { position } = useLayout();
 
     return (
