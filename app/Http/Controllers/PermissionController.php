@@ -66,16 +66,31 @@ class PermissionController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(PermissionRequest $request, Permission $permission)
     {
-        //
+        if($permission){
+                $permission->update([
+                'label' => $request->validated('label'),
+                'description' => $request->validated('description'),
+                'module' => $request->validated('module'),
+                'name' => Str::slug($request->validated('label')),
+                ]);
+               return redirect()->route('permissions.index')->with('success', 'Permission updated successfully.');
+            }
+
+            return redirect()->back()->with('error', 'Unable to update permission. Please try again.');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Permission $permission)
     {
-        //
+        if ($permission) {
+            $permission->delete();
+            return redirect()->route('permissions.index')->with('success', 'Permission deleted successfully.');
+        }
+
+        return redirect()->back()->with('error', 'Unable to delete permission. Please try again.');
     }
 }
