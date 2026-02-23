@@ -108,7 +108,10 @@ export const CustomTable = ({ columns, actions, data, from, onDelete, onView, on
                                 <td className="border px-4 py-2 text-center dark:border-gray-700 dark:text-gray-100">{from + index}</td>
 
                                 {columns.map((col) => (
-                                    <td key={col.key} className="border px-4 py-2 text-center dark:border-gray-700 dark:text-gray-100">
+                                    <td
+                                        key={col.key}
+                                        className={`border px-4 py-2 text-center dark:border-gray-700 dark:text-gray-100 ${col.className || ''}`}
+                                    >
                                         {col.isImage ? (
                                             <div>
                                                 <img src={row[col.key]} alt={row.name || 'Image'} className="h-16 w-20 rounded-lg object-cover" />

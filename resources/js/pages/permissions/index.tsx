@@ -63,7 +63,7 @@ export default function Index({ permissions }: IndexProps) {
     const flashMessage = flash?.success || flash?.error;
     const [modalOpen, setModalOpen] = useState(false);
     const [mode, setMode] = useState<'create' | 'view' | 'edit'>('create');
-    const [selectedCategory, setSelectedCategory] = useState<any>(null);
+    const [selectedPermission, setSelectedPermission] = useState<any>(null);
 
     const { data, setData, errors, processing, reset, post } = useForm({
         module: '',
@@ -98,10 +98,10 @@ export default function Index({ permissions }: IndexProps) {
         e.preventDefault();
 
         // Edit mode
-        if (mode === 'edit' && selectedCategory) {
+        if (mode === 'edit' && selectedPermission) {
             data._method = 'PUT';
 
-            post(route('permissions.update', selectedCategory.id), {
+            post(route('permissions.update', selectedPermission.id), {
                 forceFormData: true,
                 onSuccess: (response: { props: FlashProps }) => {
                     const successMessage = response.props.flash?.success || 'Permission updated successfully.';
@@ -135,8 +135,8 @@ export default function Index({ permissions }: IndexProps) {
     // Closing modal
     const closeModal = () => {
         setMode('create');
-        setPreviewImage(null);
-        setSelectedCategory(null);
+
+        setSelectedPermission(null);
         reset();
         setModalOpen(false);
     };
@@ -147,23 +147,23 @@ export default function Index({ permissions }: IndexProps) {
 
         if (!open) {
             setMode('create');
-            setSelectedCategory(null);
+            setSelectedPermission(null);
             reset();
         }
     };
 
     // Open Modal
-    const openModal = (mode: 'create' | 'view' | 'edit', category?: any) => {
+    const openModal = (mode: 'create' | 'view' | 'edit', permission?: any) => {
         setMode(mode);
 
-        if (category) {
-            Object.entries(category).forEach(([key, value]) => {
+        if (permission) {
+            Object.entries(permission).forEach(([key, value]) => {
                 if (key !== 'image') {
                     setData(key as keyof typeof data, value as string | null);
                 }
             });
 
-            setSelectedCategory(category);
+            setSelectedPermission(permission);
         } else {
             reset();
         }
