@@ -38,6 +38,16 @@ interface ButtonProps {
     variant: 'default' | 'outline' | 'ghost' | 'link' | 'destructive' | undefined;
     className: string;
 }
+interface Permissions {
+    id: number;
+    label: string;
+    name: string;
+    module: string;
+    description: string;
+}
+interface ExtraData {
+    [module: string]: Permissions[];
+}
 
 interface CustomModalFormProps {
     addButton: AddButtonProps;
@@ -54,6 +64,7 @@ interface CustomModalFormProps {
     onOpenChange: (open: boolean) => void;
     mode: 'create' | 'view' | 'edit';
     previewImage?: string | null;
+    extraData?: ExtraData;
 }
 
 export const CustomModalForm = ({
@@ -71,6 +82,7 @@ export const CustomModalForm = ({
     onOpenChange,
     mode = 'create',
     previewImage,
+    extraData,
 }: CustomModalFormProps) => {
     return (
         <Dialog open={open} onOpenChange={onOpenChange} modal>
@@ -82,7 +94,7 @@ export const CustomModalForm = ({
             </DialogTrigger>
 
             {/* Dialog content */}
-            <DialogContent onInteractOutside={(e) => e.preventDefault()} className="sm:max-w-[600px]">
+            <DialogContent onInteractOutside={(e) => e.preventDefault()} className="sm:max-w-[830px]">
                 <DialogHeader>
                     <DialogTitle>{title}</DialogTitle>
                     <DialogDescription>{description}</DialogDescription>
@@ -145,6 +157,23 @@ export const CustomModalForm = ({
                                                 ))}
                                         </SelectContent>
                                     </Select>
+                                ) : field.type === 'grouped-checkboxes' ? (
+                                    <div className="space-y-2">
+                                        {extraData &&
+                                            Object.entries(extraData).map(([module, permissions]) => (
+                                                <div key={module} className="mb-4 border-b pb-5">
+                                                    <h4 className="text-sm font-bold text-gray-700 capitalize">{module}</h4>
+                                                    <div className="ms-4 mt-2 grid grid-cols-3 gap-2 text-xs">
+                                                        {permissions.map((permission) => (
+                                                            <label className="flex items-center gap-2">
+                                                                <input type="checkbox" name={field.name} value={permission.key} />
+                                                                <span>{permission.label}</span>
+                                                            </label>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            ))}
+                                    </div>
                                 ) : (
                                     <Input
                                         id={field.id}

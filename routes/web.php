@@ -1,10 +1,11 @@
 <?php
 
-use Inertia\Inertia;
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\PermissionController;
+use App\Http\Controllers\ProductController;
+use App\Http\Controllers\RoleController;
+use Illuminate\Support\Facades\Route;
+use Inertia\Inertia;
 
 Route::get('/', function () {
     return Inertia::render('welcome');
@@ -17,7 +18,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::resource('products', ProductController::class);
     Route::resource('categories', CategoryController::class);
-      Route::resource('permissions', PermissionController::class);
+    Route::resource('permissions', PermissionController::class);
+     Route::resource('roles', RoleController::class);
 });
 
 require __DIR__.'/settings.php';
