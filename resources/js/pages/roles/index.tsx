@@ -66,13 +66,18 @@ export default function Index({ roles }: IndexProps) {
     const flashMessage = flash?.success || flash?.error;
     const [modalOpen, setModalOpen] = useState(false);
     const [mode, setMode] = useState<'create' | 'view' | 'edit'>('create');
-    const [selectedRole, setSelectedRole] = useState<any>(null);
+    const [selectedRole, setSelectedRole] = useState<Role | null>(null);
     const { permissions } = usePage().props;
 
-    const { data, setData, errors, processing, reset, post } = useForm({
-        module: '',
+    const { data, setData, errors, processing, reset, post } = useForm<{
+        label: string;
+        description: string;
+        permissions: string[];
+        _method: string;
+    }>({
         label: '',
         description: '',
+        permissions: [],
         _method: 'POST',
     });
 
@@ -120,7 +125,7 @@ export default function Index({ roles }: IndexProps) {
                 },
             });
         } else {
-            post(route('permissions.store'), {
+            post(route('roles.store'), {
                 onSuccess: (response: { props: FlashProps }) => {
                     const successMessage = response.props.flash?.success;
                     toast.success(successMessage);
@@ -157,13 +162,18 @@ export default function Index({ roles }: IndexProps) {
     };
 
     // Open Modal
-    const openModal = (mode: 'create' | 'view' | 'edit', role?: any) => {
+    const openModal = (mode: 'create' | 'view' | 'edit', role?: Role) => {
         setMode(mode);
 
         if (role) {
             Object.entries(role).forEach(([key, value]) => {
-                if (key !== 'image') {
-                    setData(key as keyof typeof data, value as string | null);
+                if (key !== 'permissions' && Array.isArray(value)) {
+                    setData(
+                        'permissions',
+                        value.map((permission: { name: string }) => permission.name),
+                    );
+                } else {
+                    setData(key as keyof typeof data, value !== null && value !== undefined ? (value as string) : '');
                 }
             });
 

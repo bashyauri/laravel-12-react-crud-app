@@ -1,8 +1,9 @@
 export const RolesTableConfig = {
     columns: [
         { label: 'Role Name', key: 'label', className: 'border p-4' },
-        { label: 'Module', key: 'module', className: 'capitalize border p-4' },
         { label: 'Description', key: 'description', className: 'w-90 border p-4' },
+        { label: 'Permissions', key: 'permissions', className: 'border p-4', type: 'multi-values' },
+
         { label: 'Actions', key: 'actions', isAction: true, className: 'border p-4' },
     ],
     actions: [

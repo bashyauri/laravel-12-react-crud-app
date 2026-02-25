@@ -11,7 +11,7 @@ class RoleRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,10 @@ class RoleRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'label' => 'required|string|max:255',
+            'description' => 'nullable|string|max:255',
+            'permissions' => 'required|array',
+            'permissions.*' => 'string|exists:permissions,name',
         ];
     }
 }

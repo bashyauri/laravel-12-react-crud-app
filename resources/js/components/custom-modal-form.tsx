@@ -165,8 +165,27 @@ export const CustomModalForm = ({
                                                     <h4 className="text-sm font-bold text-gray-700 capitalize">{module}</h4>
                                                     <div className="ms-4 mt-2 grid grid-cols-3 gap-2 text-xs">
                                                         {permissions.map((permission) => (
-                                                            <label className="flex items-center gap-2">
-                                                                <input type="checkbox" name={field.name} value={permission.key} />
+                                                            <label className="flex items-center gap-2" key={permission.id}>
+                                                                <input
+                                                                    type="checkbox"
+                                                                    name={field.name}
+                                                                    disabled={processing || mode === 'view'}
+                                                                    value={permission.name}
+                                                                    checked={(data.permissions ?? []).some((p) => p.name === permission.name)}
+                                                                    onChange={(e) => {
+                                                                        const value = permission.name;
+                                                                        const current = data.permissions || [];
+
+                                                                        if (e.target.checked) {
+                                                                            setData('permissions', [...current, value]);
+                                                                        } else {
+                                                                            setData(
+                                                                                'permissions',
+                                                                                current.filter((permission: string) => permission !== value),
+                                                                            );
+                                                                        }
+                                                                    }}
+                                                                />
                                                                 <span>{permission.label}</span>
                                                             </label>
                                                         ))}
