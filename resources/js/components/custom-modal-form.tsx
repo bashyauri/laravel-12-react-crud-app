@@ -171,7 +171,7 @@ export const CustomModalForm = ({
                                                                     name={field.name}
                                                                     disabled={processing || mode === 'view'}
                                                                     value={permission.name}
-                                                                    checked={(data.permissions ?? []).some((p) => p.name === permission.name)}
+                                                                    checked={(data.permissions ?? []).includes(permission.name)}
                                                                     onChange={(e) => {
                                                                         const value = permission.name;
                                                                         const current = data.permissions || [];

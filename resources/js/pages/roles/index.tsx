@@ -162,12 +162,12 @@ export default function Index({ roles }: IndexProps) {
     };
 
     // Open Modal
-    const openModal = (mode: 'create' | 'view' | 'edit', role?: Role) => {
+    const openModal = (mode: 'create' | 'view' | 'edit', role?: Role & { permissions?: { name: string }[] }) => {
         setMode(mode);
 
         if (role) {
             Object.entries(role).forEach(([key, value]) => {
-                if (key !== 'permissions' && Array.isArray(value)) {
+                if (key === 'permissions' && Array.isArray(value)) {
                     setData(
                         'permissions',
                         value.map((permission: { name: string }) => permission.name),
@@ -176,7 +176,6 @@ export default function Index({ roles }: IndexProps) {
                     setData(key as keyof typeof data, value !== null && value !== undefined ? (value as string) : '');
                 }
             });
-
             setSelectedRole(role);
         } else {
             reset();
