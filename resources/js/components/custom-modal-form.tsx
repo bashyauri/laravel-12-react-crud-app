@@ -48,6 +48,11 @@ interface Permissions {
 interface ExtraData {
     [module: string]: Permissions[];
 }
+interface FieldOptions {
+    label: string;
+    value: string;
+    key: string;
+}
 
 interface CustomModalFormProps {
     addButton: AddButtonProps;
@@ -140,23 +145,71 @@ export const CustomModalForm = ({
                                         )}
                                     </div>
                                 ) : field.type === 'single-select' ? (
-                                    <Select
-                                        value={data[field.name] || ''}
-                                        disabled={processing || mode === 'view'}
-                                        onValueChange={(value) => setData(field.name, value)}
-                                    >
-                                        <SelectTrigger>
-                                            <SelectValue placeholder={`Select ${field.label}`}></SelectValue>
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            {field.options &&
-                                                field.options.map((option) => (
-                                                    <SelectItem key={option.key} value={option.value}>
-                                                        {option.label}
-                                                    </SelectItem>
-                                                ))}
-                                        </SelectContent>
-                                    </Select>
+                                    <>
+                                        {/* === DEBUGGING LOGS - remove later === */}
+                                        {(() => {
+                                            const currentValue = data[field.name];
+                                            const currentValueType = typeof currentValue;
+                                            const currentValueJSON =
+                                                currentValue !== undefined && currentValue !== null
+                                                    ? JSON.stringify(currentValue, null, 2)
+                                                    : '— empty / null / undefined —';
+
+                                            const rawOptions = extraData?.[field.key] || [];
+                                            const mappedOptions = rawOptions.map((item: any) => ({
+                                                rawId: item.id,
+                                                rawName: item.name,
+                                                rawLabel: item.label,
+                                                generatedKey: item.id,
+                                                generatedValue: item.name, // ← what your code currently uses
+                                                generatedLabel: item.label,
+                                            }));
+
+                                            console.group(`🔍 Single-Select Debug: ${field.name} (${field.label})`);
+                                            console.log('Mode:', mode);
+                                            console.log('Field name / key:', field.name, '/', field.key);
+                                            console.log('Current form value:', currentValue, `(${currentValueType})`);
+                                            console.log('Current form value (stringified):', currentValueJSON);
+                                            console.log('Raw options from extraData:', rawOptions);
+                                            console.log('Number of options found:', rawOptions.length);
+                                            console.log('Mapped options (what SelectItem will receive):', mappedOptions);
+                                            console.groupEnd();
+                                        })()}
+
+                                        <Select
+                                            // Safety: force string or empty string
+                                            value={data[field.name] != null ? String(data[field.name]) : ''}
+                                            disabled={processing || mode === 'view'}
+                                            onValueChange={(value) => {
+                                                console.log(`→ Selected new value for ${field.name}:`, value);
+                                                setData(field.name, value);
+                                            }}
+                                        >
+                                            <SelectTrigger>
+                                                <SelectValue placeholder={`Select ${field.label}`} />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                {(() => {
+                                                    const optionsSource = field.options?.length
+                                                        ? field.options
+                                                        : (extraData?.[field.key] || []).map((item: any) => ({
+                                                              key: item.id,
+                                                              value: item.name, // ← currently using name
+                                                              label: item.label || item.name || 'Unnamed',
+                                                          }));
+
+                                                    // One more log of final options going to render
+                                                    console.log('Final options passed to SelectContent:', optionsSource);
+
+                                                    return optionsSource.map((option: FieldOptions) => (
+                                                        <SelectItem key={option.key} value={option.value}>
+                                                            {option.label}
+                                                        </SelectItem>
+                                                    ));
+                                                })()}
+                                            </SelectContent>
+                                        </Select>
+                                    </>
                                 ) : field.type === 'grouped-checkboxes' ? (
                                     <div className="space-y-2">
                                         {extraData &&

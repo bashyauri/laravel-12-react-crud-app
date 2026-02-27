@@ -35,11 +35,11 @@ interface CustomTableProps {
 }
 
 export const CustomTable = ({ columns, actions, data, from, onDelete, onView, onEdit, isModal }: CustomTableProps) => {
-    console.log(actions);
-
+    /*************  ✨ Windsurf Command ⭐  *************/
+    /*******  a50d6347-940d-4300-9ce8-18f744b11509  *******/
     const renderActionButtons = (row: TableRow) => {
         return (
-            <div className="flex">
+            <div className="flex justify-center">
                 {actions.map((action, index) => {
                     const IconComponent = LucidIcons[action.icon] as React.ElementType;
 
