@@ -113,10 +113,10 @@ export default function Index({ users, roles }: IndexProps) {
         e.preventDefault();
 
         // Edit mode
-        if (mode === 'edit' && selectedRole) {
+        if (mode === 'edit' && selectedUser) {
             data._method = 'PUT';
 
-            post(route('users.update', selectedUser?.id), {
+            post(route('users.update', selectedUser.id), {
                 forceFormData: true,
                 onSuccess: (response: { props: FlashProps }) => {
                     const successMessage = response.props.flash?.success || 'User updated successfully.';
@@ -152,7 +152,7 @@ export default function Index({ users, roles }: IndexProps) {
     const closeModal = () => {
         setMode('create');
 
-        setSelectedRole(null);
+        setSelectedUser(null);
         reset();
         setModalOpen(false);
     };
@@ -163,22 +163,19 @@ export default function Index({ users, roles }: IndexProps) {
 
         if (!open) {
             setMode('create');
-            setSelectedRole(null);
+            setSelectedUser(null);
             reset();
         }
     };
 
     // Open Modal
-    const openModal = (mode: 'create' | 'view' | 'edit', user?: User & { permissions?: { name: string }[] }) => {
+    const openModal = (mode: 'create' | 'view' | 'edit', user?: User & { roles?: { name: string }[] }) => {
         setMode(mode);
 
         if (user) {
             Object.entries(user).forEach(([key, value]) => {
-                if (key === 'permissions' && Array.isArray(value)) {
-                    setData(
-                        'permissions',
-                        value.map((permission: { name: string }) => permission.name),
-                    );
+                if (key === 'roles' && Array.isArray(value)) {
+                    setData('roles', value.map((role: { name: string }) => role.name).join(','));
                 } else {
                     setData(key as keyof typeof data, value !== null && value !== undefined ? (value as string) : '');
                 }

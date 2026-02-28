@@ -3,6 +3,8 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\Rule;
 
 class UserRequest extends FormRequest
 {
@@ -20,13 +22,31 @@ class UserRequest extends FormRequest
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
     public function rules(): array
-    {
-        return [
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email,' . $this->route('user'),
-            'password' => $this->isMethod('post') ? 'required|string|min:8' : 'nullable|string|min:8',
-            'confirm_password' => $this->isMethod('post') ? 'required|string|min:8|same:password' : 'nullable|string|min:8|same:password',
-            'roles' => 'required',
-        ];
-    }
+{
+    $userParam = $this->route('user');
+    $userId = is_object($userParam) ? $userParam->id : $userParam;
+    Log::info('UserRequest $userId for email unique rule: ' . var_export($userId, true));
+
+    return [
+        'name'          => ['required', 'string', 'max:255'],
+        'email'         => [
+            'required',
+            'email',
+            Rule::unique('users', 'email')->ignore($userId),
+        ],
+        'password'      => [
+            $this->isMethod('post') ? 'required' : 'nullable',
+            'string',
+            'min:8',
+             'confirmed',               // if using password + password_confirmation
+        ],
+        'confirm_password' => [
+            $this->isMethod('post') ? 'required' : 'nullable',
+            'string',
+            'min:8',
+            'same:password',
+        ],
+        'roles'         => 'required',
+    ];
+}
 }

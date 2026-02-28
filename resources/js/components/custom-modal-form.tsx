@@ -107,164 +107,170 @@ export const CustomModalForm = ({
 
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div className="grid gap-6">
-                        {fields.map((field) => (
-                            <div key={field.key} className="grid gap-2">
-                                <Label htmlFor={field.id}>{field.label} </Label>
+                        {fields.map((field) => {
+                            const isHiddenPassword = field.type === 'password' && mode !== 'create'; // Hide password field in edit mode
+                            if (isHiddenPassword) {
+                                return null;
+                            }
+                            return (
+                                <div key={field.key} className="grid gap-2">
+                                    <Label htmlFor={field.id}>{field.label} </Label>
 
-                                {field.type === 'textarea' ? (
-                                    <textarea
-                                        id={field.id}
-                                        name={field.name}
-                                        placeholder={field.placeholder}
-                                        rows={field.rows}
-                                        autoComplete={field.autocomplete}
-                                        tabIndex={field.tabIndex}
-                                        className={field.className}
-                                        onChange={(e) => setData(field.name, e.target.value)}
-                                        value={data[field.name] || ''}
-                                        disabled={processing || mode === 'view'}
-                                    />
-                                ) : field.type === 'file' ? (
-                                    <div className="space-y-2">
-                                        {/* Image preview only */}
-                                        {mode !== 'create' && previewImage && (
-                                            <img src={previewImage} alt={data?.[field.key]} className="h-32 w-32 rounded object-cover" />
-                                        )}
-
-                                        {/* File input */}
-                                        {mode !== 'view' && (
-                                            <Input
-                                                id={field.id}
-                                                name={field.name}
-                                                type="file"
-                                                accept={field.accept}
-                                                tabIndex={field.tabIndex}
-                                                onChange={(e) => setData(field.name, e.target.files ? e.target.files[0] : null)}
-                                                disabled={processing}
-                                            />
-                                        )}
-                                    </div>
-                                ) : field.type === 'single-select' ? (
-                                    <>
-                                        {/* === DEBUGGING LOGS - remove later === */}
-                                        {(() => {
-                                            const currentValue = data[field.name];
-                                            const currentValueType = typeof currentValue;
-                                            const currentValueJSON =
-                                                currentValue !== undefined && currentValue !== null
-                                                    ? JSON.stringify(currentValue, null, 2)
-                                                    : '— empty / null / undefined —';
-
-                                            const rawOptions = extraData?.[field.key] || [];
-                                            const mappedOptions = rawOptions.map((item: any) => ({
-                                                rawId: item.id,
-                                                rawName: item.name,
-                                                rawLabel: item.label,
-                                                generatedKey: item.id,
-                                                generatedValue: item.name, // ← what your code currently uses
-                                                generatedLabel: item.label,
-                                            }));
-
-                                            console.group(`🔍 Single-Select Debug: ${field.name} (${field.label})`);
-                                            console.log('Mode:', mode);
-                                            console.log('Field name / key:', field.name, '/', field.key);
-                                            console.log('Current form value:', currentValue, `(${currentValueType})`);
-                                            console.log('Current form value (stringified):', currentValueJSON);
-                                            console.log('Raw options from extraData:', rawOptions);
-                                            console.log('Number of options found:', rawOptions.length);
-                                            console.log('Mapped options (what SelectItem will receive):', mappedOptions);
-                                            console.groupEnd();
-                                        })()}
-
-                                        <Select
-                                            // Safety: force string or empty string
-                                            value={data[field.name] != null ? String(data[field.name]) : ''}
+                                    {field.type === 'textarea' ? (
+                                        <textarea
+                                            id={field.id}
+                                            name={field.name}
+                                            placeholder={field.placeholder}
+                                            rows={field.rows}
+                                            autoComplete={field.autocomplete}
+                                            tabIndex={field.tabIndex}
+                                            className={field.className}
+                                            onChange={(e) => setData(field.name, e.target.value)}
+                                            value={data[field.name] || ''}
                                             disabled={processing || mode === 'view'}
-                                            onValueChange={(value) => {
-                                                console.log(`→ Selected new value for ${field.name}:`, value);
-                                                setData(field.name, value);
-                                            }}
-                                        >
-                                            <SelectTrigger>
-                                                <SelectValue placeholder={`Select ${field.label}`} />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                {(() => {
-                                                    const optionsSource = field.options?.length
-                                                        ? field.options
-                                                        : (extraData?.[field.key] || []).map((item: any) => ({
-                                                              key: item.id,
-                                                              value: item.name, // ← currently using name
-                                                              label: item.label || item.name || 'Unnamed',
-                                                          }));
+                                        />
+                                    ) : field.type === 'file' ? (
+                                        <div className="space-y-2">
+                                            {/* Image preview only */}
+                                            {mode !== 'create' && previewImage && (
+                                                <img src={previewImage} alt={data?.[field.key]} className="h-32 w-32 rounded object-cover" />
+                                            )}
 
-                                                    // One more log of final options going to render
-                                                    console.log('Final options passed to SelectContent:', optionsSource);
+                                            {/* File input */}
+                                            {mode !== 'view' && (
+                                                <Input
+                                                    id={field.id}
+                                                    name={field.name}
+                                                    type="file"
+                                                    accept={field.accept}
+                                                    tabIndex={field.tabIndex}
+                                                    onChange={(e) => setData(field.name, e.target.files ? e.target.files[0] : null)}
+                                                    disabled={processing}
+                                                />
+                                            )}
+                                        </div>
+                                    ) : field.type === 'single-select' ? (
+                                        <>
+                                            {/* === DEBUGGING LOGS - remove later === */}
+                                            {(() => {
+                                                const currentValue = data[field.name];
+                                                const currentValueType = typeof currentValue;
+                                                const currentValueJSON =
+                                                    currentValue !== undefined && currentValue !== null
+                                                        ? JSON.stringify(currentValue, null, 2)
+                                                        : '— empty / null / undefined —';
 
-                                                    return optionsSource.map((option: FieldOptions) => (
-                                                        <SelectItem key={option.key} value={option.value}>
-                                                            {option.label}
-                                                        </SelectItem>
-                                                    ));
-                                                })()}
-                                            </SelectContent>
-                                        </Select>
-                                    </>
-                                ) : field.type === 'grouped-checkboxes' ? (
-                                    <div className="space-y-2">
-                                        {extraData &&
-                                            Object.entries(extraData).map(([module, permissions]) => (
-                                                <div key={module} className="mb-4 border-b pb-5">
-                                                    <h4 className="text-sm font-bold text-gray-700 capitalize">{module}</h4>
-                                                    <div className="ms-4 mt-2 grid grid-cols-3 gap-2 text-xs">
-                                                        {permissions.map((permission) => (
-                                                            <label className="flex items-center gap-2" key={permission.id}>
-                                                                <input
-                                                                    type="checkbox"
-                                                                    name={field.name}
-                                                                    disabled={processing || mode === 'view'}
-                                                                    value={permission.name}
-                                                                    checked={(data.permissions ?? []).includes(permission.name)}
-                                                                    onChange={(e) => {
-                                                                        const value = permission.name;
-                                                                        const current = data.permissions || [];
+                                                const rawOptions = extraData?.[field.key] || [];
+                                                const mappedOptions = rawOptions.map((item: any) => ({
+                                                    rawId: item.id,
+                                                    rawName: item.name,
+                                                    rawLabel: item.label,
+                                                    generatedKey: item.id,
+                                                    generatedValue: item.name, // ← what your code currently uses
+                                                    generatedLabel: item.label,
+                                                }));
 
-                                                                        if (e.target.checked) {
-                                                                            setData('permissions', [...current, value]);
-                                                                        } else {
-                                                                            setData(
-                                                                                'permissions',
-                                                                                current.filter((permission: string) => permission !== value),
-                                                                            );
-                                                                        }
-                                                                    }}
-                                                                />
-                                                                <span>{permission.label}</span>
-                                                            </label>
-                                                        ))}
+                                                console.group(`🔍 Single-Select Debug: ${field.name} (${field.label})`);
+                                                console.log('Mode:', mode);
+                                                console.log('Field name / key:', field.name, '/', field.key);
+                                                console.log('Current form value:', currentValue, `(${currentValueType})`);
+                                                console.log('Current form value (stringified):', currentValueJSON);
+                                                console.log('Raw options from extraData:', rawOptions);
+                                                console.log('Number of options found:', rawOptions.length);
+                                                console.log('Mapped options (what SelectItem will receive):', mappedOptions);
+                                                console.groupEnd();
+                                            })()}
+
+                                            <Select
+                                                // Safety: force string or empty string
+                                                value={data[field.name] != null ? String(data[field.name]) : ''}
+                                                disabled={processing || mode === 'view'}
+                                                onValueChange={(value) => {
+                                                    console.log(`→ Selected new value for ${field.name}:`, value);
+                                                    setData(field.name, value);
+                                                }}
+                                            >
+                                                <SelectTrigger>
+                                                    <SelectValue placeholder={`Select ${field.label}`} />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    {(() => {
+                                                        const optionsSource = field.options?.length
+                                                            ? field.options
+                                                            : (extraData?.[field.key] || []).map((item: any) => ({
+                                                                  key: item.id,
+                                                                  value: item.name, // ← currently using name
+                                                                  label: item.label || item.name || 'Unnamed',
+                                                              }));
+
+                                                        // One more log of final options going to render
+                                                        console.log('Final options passed to SelectContent:', optionsSource);
+
+                                                        return optionsSource.map((option: FieldOptions) => (
+                                                            <SelectItem key={option.key} value={option.value}>
+                                                                {option.label}
+                                                            </SelectItem>
+                                                        ));
+                                                    })()}
+                                                </SelectContent>
+                                            </Select>
+                                        </>
+                                    ) : field.type === 'grouped-checkboxes' ? (
+                                        <div className="space-y-2">
+                                            {extraData &&
+                                                Object.entries(extraData).map(([module, permissions]) => (
+                                                    <div key={module} className="mb-4 border-b pb-5">
+                                                        <h4 className="text-sm font-bold text-gray-700 capitalize">{module}</h4>
+                                                        <div className="ms-4 mt-2 grid grid-cols-3 gap-2 text-xs">
+                                                            {permissions.map((permission) => (
+                                                                <label className="flex items-center gap-2" key={permission.id}>
+                                                                    <input
+                                                                        type="checkbox"
+                                                                        name={field.name}
+                                                                        disabled={processing || mode === 'view'}
+                                                                        value={permission.name}
+                                                                        checked={(data.permissions ?? []).includes(permission.name)}
+                                                                        onChange={(e) => {
+                                                                            const value = permission.name;
+                                                                            const current = data.permissions || [];
+
+                                                                            if (e.target.checked) {
+                                                                                setData('permissions', [...current, value]);
+                                                                            } else {
+                                                                                setData(
+                                                                                    'permissions',
+                                                                                    current.filter((permission: string) => permission !== value),
+                                                                                );
+                                                                            }
+                                                                        }}
+                                                                    />
+                                                                    <span>{permission.label}</span>
+                                                                </label>
+                                                            ))}
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            ))}
-                                    </div>
-                                ) : (
-                                    <Input
-                                        id={field.id}
-                                        name={field.name}
-                                        type={field.type}
-                                        placeholder={field.placeholder}
-                                        autoComplete={field.autocomplete}
-                                        tabIndex={field.tabIndex}
-                                        autoFocus={field.autoFocus}
-                                        onChange={(e) => setData(field.name, e.target.value)}
-                                        value={data[field.name] || ''}
-                                        disabled={processing || mode === 'view'}
-                                    />
-                                )}
+                                                ))}
+                                        </div>
+                                    ) : (
+                                        <Input
+                                            id={field.id}
+                                            name={field.name}
+                                            type={field.type}
+                                            placeholder={field.placeholder}
+                                            autoComplete={field.autocomplete}
+                                            tabIndex={field.tabIndex}
+                                            autoFocus={field.autoFocus}
+                                            onChange={(e) => setData(field.name, e.target.value)}
+                                            value={data[field.name] || ''}
+                                            disabled={processing || mode === 'view'}
+                                        />
+                                    )}
 
-                                {/* Form Validation error */}
-                                <InputError message={errors?.[field.name]} />
-                            </div>
-                        ))}
+                                    {/* Form Validation error */}
+                                    <InputError message={errors?.[field.name]} />
+                                </div>
+                            );
+                        })}
                     </div>
                     <DialogFooter>
                         {buttons.map((button) => {
