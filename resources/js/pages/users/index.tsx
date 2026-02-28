@@ -72,14 +72,18 @@ export default function Index({ users, roles }: IndexProps) {
     const [selectedUser, setSelectedUser] = useState<User | null>(null);
 
     const { data, setData, errors, processing, reset, post } = useForm<{
-        label: string;
-        description: string;
-        permissions: string[];
+        name: string;
+        email: string;
+        password: string;
+        confirm_password: string;
+        roles: string;
         _method: string;
     }>({
-        label: '',
-        description: '',
-        permissions: [],
+        name: '',
+        email: '',
+        password: '',
+        confirm_password: '',
+        roles: '',
         _method: 'POST',
     });
 
@@ -112,10 +116,10 @@ export default function Index({ users, roles }: IndexProps) {
         if (mode === 'edit' && selectedRole) {
             data._method = 'PUT';
 
-            post(route('roles.update', selectedRole.id), {
+            post(route('users.update', selectedUser?.id), {
                 forceFormData: true,
                 onSuccess: (response: { props: FlashProps }) => {
-                    const successMessage = response.props.flash?.success || 'Role updated successfully.';
+                    const successMessage = response.props.flash?.success || 'User updated successfully.';
                     toast.success(successMessage);
                     closeModal();
                 },
@@ -127,7 +131,8 @@ export default function Index({ users, roles }: IndexProps) {
                 },
             });
         } else {
-            post(route('roles.store'), {
+            post(route('users.store'), {
+                forceFormData: true,
                 onSuccess: (response: { props: FlashProps }) => {
                     const successMessage = response.props.flash?.success;
                     toast.success(successMessage);
