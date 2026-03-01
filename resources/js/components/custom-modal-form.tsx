@@ -169,16 +169,6 @@ export const CustomModalForm = ({
                                                     generatedValue: item.name, // ← what your code currently uses
                                                     generatedLabel: item.label,
                                                 }));
-
-                                                console.group(`🔍 Single-Select Debug: ${field.name} (${field.label})`);
-                                                console.log('Mode:', mode);
-                                                console.log('Field name / key:', field.name, '/', field.key);
-                                                console.log('Current form value:', currentValue, `(${currentValueType})`);
-                                                console.log('Current form value (stringified):', currentValueJSON);
-                                                console.log('Raw options from extraData:', rawOptions);
-                                                console.log('Number of options found:', rawOptions.length);
-                                                console.log('Mapped options (what SelectItem will receive):', mappedOptions);
-                                                console.groupEnd();
                                             })()}
 
                                             <Select
@@ -186,7 +176,6 @@ export const CustomModalForm = ({
                                                 value={data[field.name] != null ? String(data[field.name]) : ''}
                                                 disabled={processing || mode === 'view'}
                                                 onValueChange={(value) => {
-                                                    console.log(`→ Selected new value for ${field.name}:`, value);
                                                     setData(field.name, value);
                                                 }}
                                             >
@@ -202,9 +191,6 @@ export const CustomModalForm = ({
                                                                   value: item.name, // ← currently using name
                                                                   label: item.label || item.name || 'Unnamed',
                                                               }));
-
-                                                        // One more log of final options going to render
-                                                        console.log('Final options passed to SelectContent:', optionsSource);
 
                                                         return optionsSource.map((option: FieldOptions) => (
                                                             <SelectItem key={option.key} value={option.value}>
