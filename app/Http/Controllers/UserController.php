@@ -6,6 +6,7 @@ use App\Http\Requests\UserRequest;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Inertia\Inertia;
 
@@ -16,15 +17,26 @@ class UserController extends Controller
      */
     public function index()
     {
+        $authUser = Auth::user();
+        $authUserRole = $authUser->roles->first()?->name;
 
-        $users = User::with('roles')->latest()->paginate(10);
+        // Query users based on authentication user's role
+        $usersQuery = User::with('roles');
 
+        // Super-admin can see all users, others see only their role users
+        if (!in_array($authUserRole, ['super-admin', 'admin-role'])) {
+            $usersQuery->whereHas('roles', function ($query) use ($authUserRole) {
+                $query->where('name', $authUserRole);
+            });
+        }
+
+        $users = $usersQuery->latest()->paginate(10);
         $roles = Role::get();
-        return Inertia::render('users/index',[
+
+        return Inertia::render('users/index', [
             'users' => $users,
             'roles' => $roles,
         ]);
-
     }
 
     /**
@@ -40,19 +52,15 @@ class UserController extends Controller
      */
     public function store(UserRequest $request)
     {
-       $user = User::create([
+        $user = User::create([
             'name' => $request->validated('name'),
             'email' => $request->validated('email'),
             'password' => Hash::make($request->validated('password')),
         ]);
-        if($user){
-            $user->syncRoles($request->validated('roles'));
-             return redirect()->route('users.index')->with('success', 'User created with roles successfully.');
 
-        }
-            return redirect()->route('users.index')->with('error', 'Failed to create user.');
+        $user->syncRoles($request->validated('roles'));
 
-
+        return redirect()->route('users.index')->with('success', 'User created successfully with roles.');
     }
 
     /**
@@ -76,24 +84,23 @@ class UserController extends Controller
      */
     public function update(UserRequest $request, User $user)
     {
-       if($user){
-          $user->update([
+        $user->update([
             'name' => $request->validated('name'),
             'email' => $request->validated('email'),
         ]);
+
         $user->syncRoles($request->validated('roles'));
-         return redirect()->route('users.index')->with('success', 'User updated with roles successfully.');
 
-       }
-
-            return redirect()->back()->with('error', 'Failed to update user.');
+        return redirect()->route('users.index')->with('success', 'User updated successfully with roles.');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(User $user)
     {
-        //
+        $user->delete();
+
+        return redirect()->route('users.index')->with('success', 'User deleted successfully.');
     }
 }

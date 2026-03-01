@@ -11,6 +11,7 @@ export const RoleModalFormConfig = {
         icon: CirclePlus,
         type: 'button',
         variant: 'default',
+        permission: 'create-role',
     },
     fields: [
         {
