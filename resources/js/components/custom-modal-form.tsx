@@ -1,6 +1,8 @@
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
+import { hasPermission } from '@/utils/authorization';
+import { usePage } from '@inertiajs/react';
 import { DialogClose } from '@radix-ui/react-dialog';
 import InputError from './input-error';
 import { Input } from './ui/input';
@@ -13,6 +15,7 @@ interface AddButtonProps {
     icon: string;
     type: 'button' | 'submit' | 'reset' | undefined;
     variant: 'default' | 'outline' | 'ghost' | 'link' | 'destructive' | undefined;
+    permission?: string; // Optional permission property
 }
 
 interface FieldProps {
@@ -89,17 +92,22 @@ export const CustomModalForm = ({
     previewImage,
     extraData,
 }: CustomModalFormProps) => {
+    const { auth } = usePage().props as any;
+    const userRoles = auth?.roles || [];
+    const userPermissions = auth?.permissions || [];
     return (
         <Dialog open={open} onOpenChange={onOpenChange} modal>
             {/* Button will trigger modal */}
-            <DialogTrigger asChild>
-                <Button type={addButton.type} id={addButton.id} variant={addButton.variant} className={addButton.className}>
-                    {addButton.icon && <addButton.icon />} {addButton.label}
-                </Button>
-            </DialogTrigger>
+            {addButton.permission && hasPermission(userPermissions, addButton.permission) && (
+                <DialogTrigger asChild>
+                    <Button type={addButton.type} id={addButton.id} variant={addButton.variant} className={addButton.className}>
+                        {addButton.icon && <addButton.icon />} {addButton.label}
+                    </Button>
+                </DialogTrigger>
+            )}
 
             {/* Dialog content */}
-            <DialogContent onInteractOutside={(e) => e.preventDefault()} className="sm:max-w-[830px]">
+            <DialogContent onInteractOutside={(e) => e.preventDefault()} className="max-h-[90vh] w-[95%] overflow-y-auto sm:w-auto sm:max-w-[830px]">
                 <DialogHeader>
                     <DialogTitle>{title}</DialogTitle>
                     <DialogDescription>{description}</DialogDescription>
@@ -258,7 +266,7 @@ export const CustomModalForm = ({
                             );
                         })}
                     </div>
-                    <DialogFooter>
+                    <DialogFooter className="flex flex-wrap gap-2 sm:gap-4">
                         {buttons.map((button) => {
                             if (button.key === 'cancel') {
                                 return (

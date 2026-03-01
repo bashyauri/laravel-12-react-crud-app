@@ -6,13 +6,19 @@ export const UsersTableConfig = {
         { label: 'Actions', key: 'actions', isAction: true, className: 'border p-4' },
     ],
     actions: [
-        { label: 'View', icon: 'Eye', className: 'cursor-pointer rounded-lg bg-sky-600 p-2 text-white hover:opacity-90' },
-        { label: 'Edit', icon: 'Pencil', className: 'ms-2 cursor-pointer rounded-lg bg-blue-600 p-2 text-white hover:opacity-90' },
+        { label: 'View', icon: 'Eye', className: 'cursor-pointer rounded-lg bg-sky-600 p-2 text-white hover:opacity-90', permission: 'view-user' },
+        {
+            label: 'Edit',
+            icon: 'Pencil',
+            className: 'ms-2 cursor-pointer rounded-lg bg-blue-600 p-2 text-white hover:opacity-90',
+            permission: 'edit-user',
+        },
         {
             label: 'Delete',
             icon: 'Trash2',
             route: 'users.destroy',
             className: 'ms-2 cursor-pointer rounded-lg bg-red-600 p-2 text-white hover:opacity-90',
+            permission: 'delete-user',
         },
     ],
 };
